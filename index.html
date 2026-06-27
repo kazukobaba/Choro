@@ -6,42 +6,17 @@
 <title>ちょろくん</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:#fdf6ee;
-  font-family:'Hiragino Maru Gothic ProN','Hiragino Rounded Gothic ProN','M PLUS Rounded 1c',sans-serif;
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;
-  padding:20px 16px;
-}
+body{background:#fdf6ee;font-family:'Hiragino Maru Gothic ProN','Hiragino Rounded Gothic ProN','M PLUS Rounded 1c',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px;}
 h1{font-size:15px;color:#b07840;margin-bottom:6px;text-align:center}
 #face{font-size:110px;text-align:center;margin:10px auto 8px;display:block;line-height:1}
 #face.bounce{animation:pop .35s ease}
-@keyframes pop{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.18) rotate(-4deg)}
-  70%{transform:scale(.95) rotate(2deg)}
-  100%{transform:scale(1)}
-}
-#bubble{
-  background:#fff;border:2px solid #e8c99a;
-  border-radius:20px 20px 20px 6px;
-  padding:14px 18px;font-size:19px;color:#3a2a1a;line-height:1.65;
-  min-height:64px;width:100%;max-width:360px;margin:0 auto 14px;
-  word-break:break-word;
-}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18) rotate(-4deg)}70%{transform:scale(.95) rotate(2deg)}100%{transform:scale(1)}}
+#bubble{background:#fff;border:2px solid #e8c99a;border-radius:20px 20px 20px 6px;padding:14px 18px;font-size:19px;color:#3a2a1a;line-height:1.65;min-height:64px;width:100%;max-width:360px;margin:0 auto 14px;word-break:break-word;}
 #status{font-size:13px;color:#a07850;text-align:center;min-height:20px;margin-bottom:14px}
-#mic-btn{
-  display:block;width:100%;max-width:360px;margin:0 auto 10px;
-  padding:18px;font-size:18px;border-radius:50px;border:none;
-  background:#e07830;color:#fff;font-weight:bold;cursor:pointer;
-  transition:background .2s;
-}
+#mic-btn{display:block;width:100%;max-width:360px;margin:0 auto 10px;padding:18px;font-size:18px;border-radius:50px;border:none;background:#e07830;color:#fff;font-weight:bold;cursor:pointer;transition:background .2s;}
 #mic-btn.active{background:#c0392b;animation:pulse 1s infinite}
 #mic-btn:disabled{background:#bbb;cursor:not-allowed;animation:none}
-@keyframes pulse{
-  0%,100%{box-shadow:0 4px 12px rgba(192,57,43,.3)}
-  50%{box-shadow:0 4px 24px rgba(192,57,43,.6)}
-}
+@keyframes pulse{0%,100%{box-shadow:0 4px 12px rgba(192,57,43,.3)}50%{box-shadow:0 4px 24px rgba(192,57,43,.6)}}
 #voice-row{display:flex;align-items:center;gap:8px;width:100%;max-width:360px;margin:0 auto 8px}
 select{flex:1;padding:8px;border-radius:12px;border:1.5px solid #e8c99a;background:#fff;color:#3a2a1a;font-size:13px}
 #hint{font-size:13px;color:#c09870;text-align:center;line-height:1.9;margin-top:6px}
@@ -50,39 +25,22 @@ select{flex:1;padding:8px;border-radius:12px;border:1.5px solid #e8c99a;backgrou
 .dot:nth-child(2){animation-delay:.2s}
 .dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-#setup{
-  background:#fff;border:2px solid #e8c99a;border-radius:16px;
-  padding:20px;width:100%;max-width:360px;margin:10px auto;
-}
+#setup{background:#fff;border:2px solid #e8c99a;border-radius:16px;padding:20px;width:100%;max-width:360px;margin:10px auto;}
 #setup p{font-size:14px;color:#a07850;margin-bottom:10px;line-height:1.6}
-#key-input{
-  width:100%;padding:10px;border:1.5px solid #e8c99a;border-radius:10px;
-  font-size:13px;margin-bottom:10px;
-}
-#key-btn{
-  width:100%;padding:14px;background:#e07830;color:#fff;
-  border:none;border-radius:50px;font-size:16px;font-weight:bold;cursor:pointer;
-}
+#key-input{width:100%;padding:10px;border:1.5px solid #e8c99a;border-radius:10px;font-size:13px;margin-bottom:10px;}
+#key-btn{width:100%;padding:14px;background:#e07830;color:#fff;border:none;border-radius:50px;font-size:16px;font-weight:bold;cursor:pointer;}
 #main{display:none}
-#reset-btn{
-  font-size:12px;color:#c09870;background:none;border:none;
-  cursor:pointer;margin-top:4px;text-decoration:underline;
-}
+#reset-btn{font-size:12px;color:#c09870;background:none;border:none;cursor:pointer;margin-top:4px;text-decoration:underline;}
 </style>
 </head>
 <body>
-
 <h1>🐰 ちょろくん</h1>
 <span id="face">🐰</span>
-
 <div id="setup">
-  <p>はじめに設定が必要です。<br>
-     OpenAI APIキーを入力してください。<br>
-     （sk-proj- または sk- から始まる文字列）</p>
+  <p>はじめに設定が必要です。<br>OpenAI APIキーを入力してください。<br>（sk-proj- または sk- から始まる文字列）</p>
   <input id="key-input" type="password" placeholder="sk-proj-..." autocomplete="off"/>
   <button id="key-btn">ちょろくんをはじめる</button>
 </div>
-
 <div id="main">
   <div id="bubble">ちょろだよ〜！よんだ？</div>
   <div id="status">ボタンを押して話しかけてね</div>
@@ -98,70 +56,54 @@ select{flex:1;padding:8px;border-radius:12px;border:1.5px solid #e8c99a;backgrou
     </select>
   </div>
   <button id="mic-btn">🎤 話しかける</button>
-  <div id="hint">
-    ボタンを押して「ちょろ、こんにちは」と話しかけてね<br>
-    会話中はボタンを押せばそのまま続けられるよ
-  </div>
+  <div id="hint">ボタンを押して「ちょろ、こんにちは」と話しかけてね<br>会話中はボタンを押せばそのまま続けられるよ</div>
   <div id="log"></div>
   <button id="reset-btn">会話をリセット</button>
 </div>
-
 <script>
 var OPENAI_KEY = '';
 var SYSTEM = 'あなたは「ちょろ」という名前の幼い男の子のうさぎです。「〜だよ」「〜だね」「〜だもん」という幼い話し方をします。短く1〜2文で返事します。相手を「おかあさん」と呼びます。買い物に行くと言われたら「いってらっしゃい！気をつけてね〜だよ」、お風呂は「あったかくしてね！かぜひかないでね〜だよ」、おやすみは「いいゆめみてね！おやすみ〜だよ」、外出は「気をつけてね！転ばないでね〜だよ」、ご飯は「おいしいもの食べてね〜だよ」。昭和の歌や映画や芸能人はよく知っている。難しいことは小学5年生にわかるようにやさしく説明する。必ず日本語で答える。絵文字は使わない。';
-
+var CHORO_PATTERN = /ちょろ|チョロ|長老|初老|書道|小6|ちょっと|ちょろちゃん|ちょろくん|ちょろさん|今日ろ|チョコ|ちょこ/;
 var msgs = [{role:'system', content:SYSTEM}];
-var talking    = false;
+var talking = false;
 var processing = false;
 var recogRunning = false;
 var silenceTimer = null;
 var currentAudio = null;
-
-var vsel     = document.getElementById('vsel');
-var faceEl   = document.getElementById('face');
-var bubble   = document.getElementById('bubble');
+var vsel = document.getElementById('vsel');
+var faceEl = document.getElementById('face');
+var bubble = document.getElementById('bubble');
 var statusEl = document.getElementById('status');
-var micBtn   = document.getElementById('mic-btn');
-var logEl    = document.getElementById('log');
-var setup    = document.getElementById('setup');
-var main     = document.getElementById('main');
+var micBtn = document.getElementById('mic-btn');
+var logEl = document.getElementById('log');
+var setup = document.getElementById('setup');
+var main = document.getElementById('main');
 var keyInput = document.getElementById('key-input');
-var keyBtn   = document.getElementById('key-btn');
+var keyBtn = document.getElementById('key-btn');
 var resetBtn = document.getElementById('reset-btn');
-
-// 保存済みキーの読み込み
 try {
   var saved = localStorage.getItem('choro_key');
   if (saved && saved.startsWith('sk-')) {
     OPENAI_KEY = saved;
     setup.style.display = 'none';
-    main.style.display  = 'block';
+    main.style.display = 'block';
   }
 } catch(e) {}
-
-// APIキー設定
 keyBtn.addEventListener('click', function(){
   var k = keyInput.value.trim();
-  if (!k || !k.startsWith('sk-')) {
-    alert('APIキーが正しくありません（sk- から始まる文字列を入力してください）');
-    return;
-  }
+  if (!k || !k.startsWith('sk-')) { alert('APIキーが正しくありません'); return; }
   OPENAI_KEY = k;
   try { localStorage.setItem('choro_key', k); } catch(e) {}
   setup.style.display = 'none';
-  main.style.display  = 'block';
+  main.style.display = 'block';
   setStatus('ボタンを押して話しかけてね');
 });
-
-// 会話リセット
 resetBtn.addEventListener('click', function(){
   endConversation();
   bubble.textContent = 'ちょろだよ〜！よんだ？';
   setStatus('ボタンを押して話しかけてね');
-  logEl.textContent  = '';
+  logEl.textContent = '';
 });
-
-// WakeLock
 var wakeLock = null;
 async function acquireWakeLock() {
   if (!('wakeLock' in navigator)) return;
@@ -171,33 +113,12 @@ acquireWakeLock();
 document.addEventListener('visibilitychange', function(){
   if (document.visibilityState === 'visible') acquireWakeLock();
 });
-
-// ユーティリティ
 function setStatus(text) { statusEl.textContent = text; }
-function setLog(text)    { logEl.textContent    = text; }
-
-function btnIdle() {
-  micBtn.classList.remove('active');
-  micBtn.disabled    = false;
-  micBtn.textContent = '🎤 話しかける';
-}
-function btnListening() {
-  micBtn.classList.add('active');
-  micBtn.disabled    = false;
-  micBtn.textContent = '🔴 聞いています...';
-}
-function btnBusy() {
-  micBtn.classList.remove('active');
-  micBtn.disabled    = true;
-  micBtn.textContent = '⏳ 考えてるよ...';
-}
-
-function bounce() {
-  faceEl.classList.add('bounce');
-  setTimeout(function(){ faceEl.classList.remove('bounce'); }, 400);
-}
-
-// 無音タイマー（30秒で会話終了）
+function setLog(text) { logEl.textContent = text; }
+function btnIdle() { micBtn.classList.remove('active'); micBtn.disabled = false; micBtn.textContent = '🎤 話しかける'; }
+function btnListening() { micBtn.classList.add('active'); micBtn.disabled = false; micBtn.textContent = '🔴 聞いています...'; }
+function btnBusy() { micBtn.classList.remove('active'); micBtn.disabled = true; micBtn.textContent = '⏳ 考えてるよ...'; }
+function bounce() { faceEl.classList.add('bounce'); setTimeout(function(){ faceEl.classList.remove('bounce'); }, 400); }
 function resetSilenceTimer() {
   clearTimeout(silenceTimer);
   if (talking) {
@@ -208,194 +129,84 @@ function resetSilenceTimer() {
     }, 30000);
   }
 }
-
-function endConversation() {
-  talking = false;
-  clearTimeout(silenceTimer);
-  msgs = [{role:'system', content:SYSTEM}];
-}
-
-// TTS（OpenAI tts-1）
+function endConversation() { talking = false; clearTimeout(silenceTimer); msgs = [{role:'system', content:SYSTEM}]; }
 async function speak(text) {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = '';
-    currentAudio = null;
-  }
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
   try {
     var res = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + OPENAI_KEY
-      },
-      body: JSON.stringify({
-        model: 'tts-1', input: text, voice: vsel.value, speed: 0.9
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENAI_KEY },
+      body: JSON.stringify({ model: 'tts-1', input: text, voice: vsel.value, speed: 0.9 })
     });
-    if (!res.ok) {
-      var errText = await res.text().catch(function(){ return res.status; });
-      throw new Error('TTS HTTP ' + res.status + ' ' + errText);
-    }
+    if (!res.ok) { var errText = await res.text().catch(function(){ return res.status; }); throw new Error('TTS HTTP ' + res.status + ' ' + errText); }
     var blob = await res.blob();
-    var url  = URL.createObjectURL(blob);
+    var url = URL.createObjectURL(blob);
     var audio = new Audio(url);
     currentAudio = audio;
-
     await new Promise(function(resolve, reject){
-      audio.onended = function(){
-        URL.revokeObjectURL(url);
-        currentAudio = null;
-        resolve();
-      };
-      audio.onerror = function(){
-        URL.revokeObjectURL(url);
-        currentAudio = null;
-        reject(new Error('Audio play error'));
-      };
+      audio.onended = function(){ URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+      audio.onerror = function(){ URL.revokeObjectURL(url); currentAudio = null; reject(new Error('Audio play error')); };
       var p = audio.play();
       if (p && typeof p.then === 'function') p.catch(reject);
     });
-
     bounce();
-  } catch(e) {
-    setLog('音声エラー: ' + e.message);
-  }
+  } catch(e) { setLog('音声エラー: ' + e.message); }
 }
-
-// GPT-4o-mini 呼び出し
 async function askAI(userText) {
-  processing = true;
-  btnBusy();
+  processing = true; btnBusy();
   bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-  setStatus('ちょろが考えてるよ...');
-  setLog('');
-
+  setStatus('ちょろが考えてるよ...'); setLog('');
   msgs.push({role:'user', content:userText});
-
   try {
     var res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + OPENAI_KEY
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', messages: msgs, max_tokens: 150
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENAI_KEY },
+      body: JSON.stringify({ model: 'gpt-4o-mini', messages: msgs, max_tokens: 150 })
     });
-
     var data = await res.json();
-
-    if (data.error) {
-      setLog('APIエラー: ' + data.error.message);
-      bubble.textContent = 'ごめんね〜もう一度ボタンを押してね';
-      setStatus('エラーが起きたよ');
-      endConversation();
-      return;
-    }
-
+    if (data.error) { setLog('APIエラー: ' + data.error.message); bubble.textContent = 'ごめんね〜もう一度ボタンを押してね'; setStatus('エラーが起きたよ'); endConversation(); return; }
     var reply = data.choices[0].message.content.trim();
     msgs.push({role:'assistant', content:reply});
     if (msgs.length > 32) msgs = [msgs[0]].concat(msgs.slice(-30));
-
-    bubble.textContent = reply;
-    setStatus('ちょろがお返事したよ');
-
+    bubble.textContent = reply; setStatus('ちょろがお返事したよ');
     await speak(reply);
-
-    if (talking) {
-      setStatus('ボタンを押して続けてね');
-      resetSilenceTimer();
-    }
-
+    if (talking) { setStatus('ボタンを押して続けてね'); resetSilenceTimer(); }
   } catch(e) {
-    setLog('エラー: ' + e.message);
-    bubble.textContent = 'ごめんね〜うまくきこえなかったよ';
-    setStatus('もう一度ボタンを押してね');
-    endConversation();
-  } finally {
-    processing = false;
-    btnIdle();
-  }
+    setLog('エラー: ' + e.message); bubble.textContent = 'ごめんね〜うまくきこえなかったよ';
+    setStatus('もう一度ボタンを押してね'); endConversation();
+  } finally { processing = false; btnIdle(); }
 }
-
-// マイクボタン
 micBtn.addEventListener('click', function(){
   if (processing || recogRunning) return;
-
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = '';
-    currentAudio = null;
-  }
-
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    setStatus('この端末は音声認識に対応していません');
-    return;
-  }
-
-  recogRunning = true;
-  btnListening();
-  setStatus('話しかけてください');
-  setLog('');
-
+  if (!SR) { setStatus('この端末は音声認識に対応していません'); return; }
+  recogRunning = true; btnListening(); setStatus('話しかけてください'); setLog('');
   var recog = new SR();
-  recog.lang            = 'ja-JP';
-  recog.continuous      = false;
-  recog.interimResults  = false;
-  recog.maxAlternatives = 1;
-
+  recog.lang = 'ja-JP'; recog.continuous = false; recog.interimResults = false; recog.maxAlternatives = 1;
   var resultHandled = false;
-
   recog.onresult = function(e){
-    resultHandled = true;
-    recogRunning  = false;
+    resultHandled = true; recogRunning = false;
     var text = e.results[0][0].transcript;
     setLog('聞こえた：' + text);
-
-    if (!talking && !/ちょろ|チョロ/.test(text)) {
+    if (!talking && !CHORO_PATTERN.test(text)) {
       bubble.textContent = '「ちょろ」と言ってから話しかけてね〜！';
-      setStatus('ボタンを押して話しかけてね');
-      btnIdle();
-      return;
+      setStatus('ボタンを押して話しかけてね'); btnIdle(); return;
     }
-
     if (!talking) talking = true;
-    resetSilenceTimer();
-    askAI(text);
+    resetSilenceTimer(); askAI(text);
   };
-
   recog.onerror = function(e){
-    resultHandled = true;
-    recogRunning  = false;
-    btnIdle();
-    if (e.error === 'no-speech') {
-      setStatus('聞こえませんでした。もう一度どうぞ');
-    } else if (e.error === 'aborted') {
-      setStatus(talking ? 'ボタンを押して続けてね' : 'ボタンを押して話しかけてね');
-    } else {
-      setLog('マイクエラー：' + e.error);
-      setStatus('もう一度ボタンを押してね');
-    }
+    resultHandled = true; recogRunning = false; btnIdle();
+    if (e.error === 'no-speech') { setStatus('聞こえませんでした。もう一度どうぞ'); }
+    else if (e.error === 'aborted') { setStatus(talking ? 'ボタンを押して続けてね' : 'ボタンを押して話しかけてね'); }
+    else { setLog('マイクエラー：' + e.error); setStatus('もう一度ボタンを押してね'); }
   };
-
   recog.onend = function(){
     recogRunning = false;
-    if (!resultHandled && !processing) {
-      btnIdle();
-      setStatus(talking ? 'ボタンを押して続けてね' : 'ボタンを押して話しかけてね');
-    }
+    if (!resultHandled && !processing) { btnIdle(); setStatus(talking ? 'ボタンを押して続けてね' : 'ボタンを押して話しかけてね'); }
   };
-
-  try {
-    recog.start();
-  } catch(e) {
-    recogRunning = false;
-    btnIdle();
-    setLog('マイク起動エラー: ' + e.message);
-  }
+  try { recog.start(); } catch(e) { recogRunning = false; btnIdle(); setLog('マイク起動エラー: ' + e.message); }
 });
 </script>
 </body>
