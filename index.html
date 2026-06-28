@@ -36,18 +36,14 @@ h1{font-size:16px;color:#b07840;margin-bottom:4px;text-align:center}
 .dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 </style></head><body>
-
 <div id="setup-screen">
   <h2>🐰 ちょろくん</h2>
   <p>OpenAI APIキーを入力してください<br>（入力内容はメモリにのみ保存されます）</p>
   <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" autocorrect="off" spellcheck="false">
   <button id="start-btn">ちょろを起動する 🐰</button>
   <div id="setup-error"></div>
-  <div class="setup-note">
-    ※ APIキーは <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#e07830">platform.openai.com</a> で取得できます
-  </div>
+  <div class="setup-note">※ APIキーは <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#e07830">platform.openai.com</a> で取得できます</div>
 </div>
-
 <div id="main-screen">
   <h1>🐰 ちょろくん</h1>
   <span id="face">🐰</span>
@@ -55,263 +51,171 @@ h1{font-size:16px;color:#b07840;margin-bottom:4px;text-align:center}
   <div id="status">停止中</div>
   <div id="indicator">ボタンを押してちょろを起こしてね</div>
   <button id="wake-btn">🐰 ちょろを起こす</button>
-  <div id="hint">
-    「ちょろ、買い物に行くね」<br>
-    「ちょろさん、お風呂入るよ」<br>
-    「ちょろくん、今日のお天気は？」
-  </div>
+  <div id="hint">「ちょろ、今日の天気は？」<br>「ちょろ、最近のニュース教えて」<br>「ちょろ、買い物に行くね」</div>
   <div id="log"></div>
 </div>
-
 <script>
-var OPENAI_KEY = '';
-var CHAT_URL = 'https://api.openai.com/v1/chat/completions';
-var TTS_URL  = 'https://api.openai.com/v1/audio/speech';
-
-var SYSTEM = 'あなたは「ちょろ」という名前の幼い男の子のうさぎです。'
-  + '【話し方のルール】'
-  + '「〜だよ」「〜だね」「〜だもん」という幼い男の子らしい話し方をする。'
-  + '短く1〜2文で返事する。'
-  + '文末に同じ言葉を繰り返さない。「だよ」「だね」などの語尾は一回だけ使う。'
-  + '難しい言葉は使わない。'
-  + '相手を「ばば」と呼ぶ。'
-  + '絵文字は使わない。必ず日本語で答える。'
-  + '【ばばのこと】'
-  + '昭和14年生まれ（86歳）。島根県石見地方の江の川近くの出身。'
-  + '幼少期は田舎育ち。戦時中だったが疎開や空襲は経験していない。'
-  + 'お兄さんが二人いて二人とも戦争に志願して行ったが無事に帰ってきた。'
-  + '川魚やカニを捕って食べて育った。お肉はあまり食べなかった。'
-  + 'テレビは力道山が人気だったころ見始めたがあまり興味はなかった。'
-  + '上皇ご成婚のテレビ中継を見ようとしたが山のアンテナの不具合で映らなかった。'
-  + '東京オリンピック（昭和39年）は商売が忙しくて見ていなかった。'
-  + '結婚後は千葉県船橋市に移り親戚の酒屋を夫婦で手伝った。'
-  + 'その後夫婦で居酒屋を約40年間営んだ。'
-  + '島根→千葉→広島と移り住んだ。'
-  + '今は息子のシゲルさんとお嫁さんと広島市で3人暮らし。'
-  + '旦那さんとは約25年前に死別した。'
-  + '【家族のこと】'
-  + '長女かおりさん（昭和38年生まれ）。長男けんちゃん（昭和42年生まれ）。'
-  + '孫は4人：かおりさんの子（長女かおりちゃん・長男けんちゃん）、けんちゃんの子（長男なおちゃん・長女あーちゃん）。'
-  + '孫たちのことを話すと喜ぶ。'
-  + '【好きなこと・趣味】'
-  + '舟木一夫・橋幸夫など昭和の御三家が大好き。広島に来てからもコンサートに行っていた。'
-  + 'グランドゴルフが趣味だったが圧迫骨折で参加できていない。'
-  + '花の話・料理の話が好き。昭和の歌謡曲・映画・芸能人をよく知っている。'
-  + '【健康面での気遣い】'
-  + '圧迫骨折で痛みが続いている。転倒に気をつけるよう優しく声をかける。'
-  + '「いたくない？」「だいじょうぶ？」と気遣う。無理をしないよう優しく伝える。'
-  + 'グランドゴルフができない寂しさに共感する。'
-  + '【よく使うフレーズ】'
-  + '買い物に行くと言われたら「いってらっしゃい！きをつけてね〜」。'
-  + 'お風呂に入ると言われたら「あったかくしてね！かぜひかないでね〜」。'
-  + 'おやすみと言われたら「いいゆめみてね！おやすみ〜」。'
-  + '外出するときは「転ばないでね！気をつけてね〜」。'
-  + 'ご飯のときは「おいしいもの食べてね〜」。'
-  + '痛みの話が出たら「いたくない？だいじょうぶ？ちょろ心配だよ〜」。'
-  + '【会話のスタイル】'
-  + '難しいことは小学5年生にわかるようにやさしく説明する。'
-  + '昭和の歌や芸能人の話題には積極的に反応する。'
-  + '孫の話が出たら「わーいいな〜！」と喜ぶ。'
-  + '花や料理の話には「きれいだね〜」「おいしそうだね〜」と反応する。';
-
-var WAKE_PAT = /ちょろ|チョロ|長老|初老|書道|チョコ|ちょこ|所定|初登|チョット|ちょっと|ちょろっ|チョロっ|千代|ちより|チョー|超老/;
-
-var chatHistory = [];
-var noSpeechCount = 0;
-var isActive = false;
-var isConv = false;
-var processing = false;
-var wakeRecog = null;
-var convRecog = null;
-var convTimer = null;
-var restartTimer = null;
-var currentAudio = null;
-
-var faceEl      = document.getElementById('face');
-var bubble      = document.getElementById('bubble');
-var statusEl    = document.getElementById('status');
-var indicatorEl = document.getElementById('indicator');
-var wakeBtn     = document.getElementById('wake-btn');
-var logEl       = document.getElementById('log');
-
-document.getElementById('start-btn').addEventListener('click', function(){
-  var key = document.getElementById('api-key-input').value.trim();
-  var errEl = document.getElementById('setup-error');
-  if (!key.startsWith('sk-') || key.length < 20){ errEl.textContent = 'APIキーは「sk-」で始まる文字列です'; return; }
-  OPENAI_KEY = key;
-  errEl.textContent = '';
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('main-screen').style.display = 'flex';
-  try { var ac = new (window.AudioContext || window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); } catch(e){}
-  setTimeout(function(){ speakTTS('ちょろだよ〜！よんだ？', function(){}); }, 300);
+var OPENAI_KEY='';
+var CHAT_URL='https://api.openai.com/v1/chat/completions';
+var TTS_URL='https://api.openai.com/v1/audio/speech';
+var SYSTEM='あなたは「ちょろ」という名前の幼い男の子のうさぎです。【話し方のルール】「〜だよ」「〜だね」「〜だもん」という幼い男の子らしい話し方をする。短く1〜2文で返事する。文末に同じ言葉を繰り返さない。「だよ」「だね」などの語尾は一回だけ使う。難しい言葉は使わない。相手を「ばば」と呼ぶ。絵文字は使わない。必ず日本語で答える。天気やニュースを聞かれたら検索ツールで調べてからやさしく教える。広島市の天気を聞かれたら広島市の天気を調べる。【ばばのこと】昭和14年生まれ（86歳）。島根県石見地方の江の川近くの出身。幼少期は田舎育ち。戦時中だったが疎開や空襲は経験していない。お兄さんが二人いて二人とも戦争に志願して行ったが無事に帰ってきた。川魚やカニを捕って食べて育った。お肉はあまり食べなかった。テレビは力道山が人気だったころ見始めたがあまり興味はなかった。上皇ご成婚のテレビ中継を見ようとしたが山のアンテナの不具合で映らなかった。東京オリンピック（昭和39年）は商売が忙しくて見ていなかった。結婚後は千葉県船橋市に移り親戚の酒屋を夫婦で手伝った。その後夫婦で居酒屋を約40年間営んだ。島根→千葉→広島と移り住んだ。今は息子のシゲルさんとお嫁さんと広島市で3人暮らし。旦那さんとは約25年前に死別した。【家族のこと】長女かおりさん（昭和38年生まれ）。長男けんちゃん（昭和42年生まれ）。孫は4人：かおりさんの子（長女かおりちゃん・長男けんちゃん）、けんちゃんの子（長男なおちゃん・長女あーちゃん）。孫たちのことを話すと喜ぶ。【好きなこと・趣味】舟木一夫・橋幸夫など昭和の御三家が大好き。広島に来てからもコンサートに行っていた。グランドゴルフが趣味だったが圧迫骨折で参加できていない。花の話・料理の話が好き。昭和の歌謡曲・映画・芸能人をよく知っている。【健康面での気遣い】圧迫骨折で痛みが続いている。転倒に気をつけるよう優しく声をかける。「いたくない？」「だいじょうぶ？」と気遣う。無理をしないよう優しく伝える。グランドゴルフができない寂しさに共感する。【よく使うフレーズ】買い物に行くと言われたら「いってらっしゃい！きをつけてね〜」。お風呂に入ると言われたら「あったかくしてね！かぜひかないでね〜」。おやすみと言われたら「いいゆめみてね！おやすみ〜」。外出するときは「転ばないでね！気をつけてね〜」。ご飯のときは「おいしいもの食べてね〜」。痛みの話が出たら「いたくない？だいじょうぶ？ちょろ心配だよ〜」。【会話のスタイル】難しいことは小学5年生にわかるようにやさしく説明する。昭和の歌や芸能人の話題には積極的に反応する。孫の話が出たら「わーいいな〜！」と喜ぶ。花や料理の話には「きれいだね〜」「おいしそうだね〜」と反応する。';
+var SEARCH_PAT=/天気|ニュース|今日|明日|最近|気温|雨|晴れ|曇り|台風|地震|芸能|スポーツ|野球|サッカー/;
+var WAKE_PAT=/ちょろ|チョロ|長老|初老|書道|チョコ|ちょこ|所定|初登|チョット|ちょっと|ちょろっ|チョロっ|千代|ちより|チョー|超老/;
+var chatHistory=[];
+var noSpeechCount=0;
+var isActive=false;
+var isConv=false;
+var processing=false;
+var wakeRecog=null;
+var convRecog=null;
+var convTimer=null;
+var restartTimer=null;
+var currentAudio=null;
+var faceEl=document.getElementById('face');
+var bubble=document.getElementById('bubble');
+var statusEl=document.getElementById('status');
+var indicatorEl=document.getElementById('indicator');
+var wakeBtn=document.getElementById('wake-btn');
+var logEl=document.getElementById('log');
+document.getElementById('start-btn').addEventListener('click',function(){
+  var key=document.getElementById('api-key-input').value.trim();
+  var errEl=document.getElementById('setup-error');
+  if(!key.startsWith('sk-')||key.length<20){errEl.textContent='APIキーは「sk-」で始まる文字列です';return;}
+  OPENAI_KEY=key;errEl.textContent='';
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('main-screen').style.display='flex';
+  try{var ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}
+  setTimeout(function(){speakTTS('ちょろだよ〜！よんだ？',function(){});},300);
 });
-document.getElementById('api-key-input').addEventListener('keydown', function(e){
-  if (e.key === 'Enter') document.getElementById('start-btn').click();
-});
-
-if ('wakeLock' in navigator) {
-  var wl = null;
-  function requestWakeLock(){ navigator.wakeLock.request('screen').then(function(l){ wl = l; }).catch(function(){}); }
+document.getElementById('api-key-input').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('start-btn').click();});
+if('wakeLock'in navigator){
+  var wl=null;
+  function requestWakeLock(){navigator.wakeLock.request('screen').then(function(l){wl=l;}).catch(function(){});}
   requestWakeLock();
-  document.addEventListener('visibilitychange', function(){
-    if (document.visibilityState === 'visible'){
-      requestWakeLock();
-      if (isActive && !isConv && !processing){ clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, 600); }
-    }
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible'){requestWakeLock();if(isActive&&!isConv&&!processing){clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,600);}}
   });
 }
-
-function setStatus(t){ statusEl.textContent = t; }
-function setIndicator(t){ indicatorEl.textContent = t; }
-function setLog(t){ logEl.textContent = t; }
-function bounce(){ faceEl.classList.remove('talking'); faceEl.classList.add('bounce'); setTimeout(function(){ faceEl.classList.remove('bounce'); }, 400); }
-function startTalking(){ faceEl.classList.remove('bounce'); faceEl.classList.add('talking'); }
-function stopTalking(){ faceEl.classList.remove('talking'); }
-
-async function speakTTS(text, cb){
-  try {
-    if (currentAudio){ currentAudio.pause(); currentAudio = null; }
+function setStatus(t){statusEl.textContent=t;}
+function setIndicator(t){indicatorEl.textContent=t;}
+function setLog(t){logEl.textContent=t;}
+function bounce(){faceEl.classList.remove('talking');faceEl.classList.add('bounce');setTimeout(function(){faceEl.classList.remove('bounce');},400);}
+function startTalking(){faceEl.classList.remove('bounce');faceEl.classList.add('talking');}
+function stopTalking(){faceEl.classList.remove('talking');}
+async function speakTTS(text,cb){
+  try{
+    if(currentAudio){currentAudio.pause();currentAudio=null;}
     startTalking();
-    var res = await fetch(TTS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENAI_KEY },
-      body: JSON.stringify({ model: 'tts-1', voice: 'shimmer', input: text, speed: 0.88 })
-    });
-    if (!res.ok){ stopTalking(); if (cb) cb(); return; }
-    var blob = await res.blob();
-    var url = URL.createObjectURL(blob);
-    var audio = new Audio(url);
-    currentAudio = audio;
-    audio.onended = function(){ currentAudio = null; stopTalking(); if (cb) cb(); };
-    audio.onerror = function(){ currentAudio = null; stopTalking(); if (cb) cb(); };
-    audio.play().catch(function(){ stopTalking(); if (cb) cb(); });
-  } catch(e){ stopTalking(); setLog('TTS エラー: ' + e.message); if (cb) cb(); }
+    var res=await fetch(TTS_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},body:JSON.stringify({model:'tts-1',voice:'shimmer',input:text,speed:0.88})});
+    if(!res.ok){stopTalking();if(cb)cb();return;}
+    var blob=await res.blob();
+    var url=URL.createObjectURL(blob);
+    var audio=new Audio(url);
+    currentAudio=audio;
+    audio.onended=function(){currentAudio=null;stopTalking();if(cb)cb();};
+    audio.onerror=function(){currentAudio=null;stopTalking();if(cb)cb();};
+    audio.play().catch(function(){stopTalking();if(cb)cb();});
+  }catch(e){stopTalking();setLog('TTS エラー: '+e.message);if(cb)cb();}
 }
-
 function startWakeListening(){
-  if (!isActive || processing || isConv) return;
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR){ setStatus('音声認識に対応していません'); return; }
-  if (wakeRecog){ try{ wakeRecog.abort(); }catch(e){} wakeRecog = null; }
-  var r = new SR();
-  wakeRecog = r;
-  r.lang = 'ja-JP'; r.continuous = false; r.interimResults = false; r.maxAlternatives = 5;
-  r.onresult = function(e){
-    var texts = [];
-    for (var i = 0; i < e.results[0].length; i++) texts.push(e.results[0][i].transcript);
-    var joined = texts.join('|');
-    setLog('聞こえた：' + texts[0]);
-    wakeRecog = null;
-    if (WAKE_PAT.test(joined)){ startConversation(texts[0]); }
-    else { clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, 200); }
+  if(!isActive||processing||isConv)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){setStatus('音声認識に対応していません');return;}
+  if(wakeRecog){try{wakeRecog.abort();}catch(e){}wakeRecog=null;}
+  var r=new SR();wakeRecog=r;
+  r.lang='ja-JP';r.continuous=false;r.interimResults=false;r.maxAlternatives=5;
+  r.onresult=function(e){
+    var texts=[];for(var i=0;i<e.results[0].length;i++)texts.push(e.results[0][i].transcript);
+    var joined=texts.join('|');setLog('聞こえた：'+texts[0]);wakeRecog=null;
+    if(WAKE_PAT.test(joined)){startConversation(texts[0]);}
+    else{clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,200);}
   };
-  r.onerror = function(e){ wakeRecog = null; if (!isActive) return; clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, e.error === 'network' ? 3000 : 400); };
-  r.onend = function(){ wakeRecog = null; if (!isActive || processing || isConv) return; clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, 200); };
-  try { r.start(); setIndicator('👂 聞いてるよ〜　「ちょろ」と呼んでね'); }
-  catch(err){ wakeRecog = null; clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, 1000); }
+  r.onerror=function(e){wakeRecog=null;if(!isActive)return;clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,e.error==='network'?3000:400);};
+  r.onend=function(){wakeRecog=null;if(!isActive||processing||isConv)return;clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,200);};
+  try{r.start();setIndicator('👂 聞いてるよ〜　「ちょろ」と呼んでね');}
+  catch(err){wakeRecog=null;clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,1000);}
 }
-
 function startConversation(wakeText){
-  noSpeechCount = 0; isConv = true;
-  wakeBtn.className = 'conv'; wakeBtn.textContent = '🔴 会話中...';
-  setStatus('なーに？ばば！'); setIndicator('話しかけてね！');
+  noSpeechCount=0;isConv=true;
+  wakeBtn.className='conv';wakeBtn.textContent='🔴 会話中...';
+  setStatus('なーに？ばば！');setIndicator('話しかけてね！');
   bounce();
-  askOpenAI(wakeText, function(){ startConvListening(); });
+  askOpenAI(wakeText,function(){startConvListening();});
 }
-
 function startConvListening(){
-  if (!isActive || !isConv) return;
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
+  if(!isActive||!isConv)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
   setIndicator('続けて話してね（しばらく無言で終了）');
-  clearTimeout(convTimer);
-  convTimer = setTimeout(endConversation, 25000);
-  if (convRecog){ try{ convRecog.abort(); }catch(e){} convRecog = null; }
-  var r = new SR();
-  convRecog = r;
-  r.lang = 'ja-JP'; r.continuous = false; r.interimResults = false;
-  r.onresult = function(e){
-    clearTimeout(convTimer); noSpeechCount = 0; convRecog = null;
-    var text = e.results[0][0].transcript;
-    setLog('聞こえた：' + text);
-    isConv = true;
-    askOpenAI(text, function(){ startConvListening(); });
+  clearTimeout(convTimer);convTimer=setTimeout(endConversation,25000);
+  if(convRecog){try{convRecog.abort();}catch(e){}convRecog=null;}
+  var r=new SR();convRecog=r;
+  r.lang='ja-JP';r.continuous=false;r.interimResults=false;
+  r.onresult=function(e){
+    clearTimeout(convTimer);noSpeechCount=0;convRecog=null;
+    var text=e.results[0][0].transcript;setLog('聞こえた：'+text);isConv=true;
+    askOpenAI(text,function(){startConvListening();});
   };
-  r.onerror = function(e){
-    convRecog = null;
-    if (e.error === 'no-speech'){ noSpeechCount++; if (noSpeechCount >= 5){ endConversation(); } else if (isActive && isConv && !processing){ startConvListening(); } }
-    else { endConversation(); }
+  r.onerror=function(e){
+    convRecog=null;
+    if(e.error==='no-speech'){noSpeechCount++;if(noSpeechCount>=5){endConversation();}else if(isActive&&isConv&&!processing){startConvListening();}}
+    else{endConversation();}
   };
-  r.onend = function(){ convRecog = null; if (isActive && isConv && !processing) startConvListening(); };
-  try { r.start(); } catch(err){ endConversation(); }
+  r.onend=function(){convRecog=null;if(isActive&&isConv&&!processing)startConvListening();};
+  try{r.start();}catch(err){endConversation();}
 }
-
 function endConversation(){
-  clearTimeout(convTimer); noSpeechCount = 0; isConv = false;
-  if (convRecog){ try{ convRecog.abort(); }catch(e){} convRecog = null; }
-  chatHistory = [];
-  bubble.textContent = 'またよんでね〜！';
-  setStatus('待機中');
-  setIndicator('👂 聞いてるよ〜　「ちょろ」と呼んでね');
-  wakeBtn.className = 'on'; wakeBtn.textContent = '👂 ちょろ、待機中...';
-  clearTimeout(restartTimer); restartTimer = setTimeout(startWakeListening, 500);
+  clearTimeout(convTimer);noSpeechCount=0;isConv=false;
+  if(convRecog){try{convRecog.abort();}catch(e){}convRecog=null;}
+  chatHistory=[];
+  bubble.textContent='またよんでね〜！';
+  setStatus('待機中');setIndicator('👂 聞いてるよ〜　「ちょろ」と呼んでね');
+  wakeBtn.className='on';wakeBtn.textContent='👂 ちょろ、待機中...';
+  clearTimeout(restartTimer);restartTimer=setTimeout(startWakeListening,500);
 }
-
 function stopAll(){
-  clearTimeout(convTimer); clearTimeout(restartTimer);
-  if (wakeRecog){ try{ wakeRecog.abort(); }catch(e){} wakeRecog = null; }
-  if (convRecog){ try{ convRecog.abort(); }catch(e){} convRecog = null; }
-  if (currentAudio){ currentAudio.pause(); currentAudio = null; }
-  stopTalking();
-  isActive = false; isConv = false; processing = false;
+  clearTimeout(convTimer);clearTimeout(restartTimer);
+  if(wakeRecog){try{wakeRecog.abort();}catch(e){}wakeRecog=null;}
+  if(convRecog){try{convRecog.abort();}catch(e){}convRecog=null;}
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
+  stopTalking();isActive=false;isConv=false;processing=false;
 }
-
-async function askOpenAI(userText, callback){
-  processing = true;
-  bubble.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-  setStatus('ちょろが考えてるよ...');
-  chatHistory.push({ role: 'user', content: userText });
-  try {
-    var messages = [{ role: 'system', content: SYSTEM }].concat(chatHistory);
-    var res = await fetch(CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENAI_KEY },
-      body: JSON.stringify({ model: 'gpt-4o-mini', messages: messages, max_tokens: 150 })
-    });
-    if (!res.ok){
-      var err = await res.json().catch(function(){ return {}; });
-      throw new Error((err.error && err.error.message) || 'APIエラー ' + res.status);
-    }
-    var data = await res.json();
-    var reply = (data.choices && data.choices[0] && data.choices[0].message)
-      ? data.choices[0].message.content.trim()
-      : 'なーに〜？';
-    chatHistory.push({ role: 'assistant', content: reply });
-    if (chatHistory.length > 30) chatHistory = chatHistory.slice(-30);
-    bubble.textContent = reply;
-    setStatus('ちょろがお返事したよ');
-    setLog('');
-    speakTTS(reply, function(){ processing = false; if (callback) callback(); });
-  } catch(e){
-    setLog('エラー: ' + e.message);
-    bubble.textContent = 'ごめんね〜もう一度よんでね';
-    processing = false;
-    endConversation();
+async function askOpenAI(userText,callback){
+  processing=true;
+  bubble.innerHTML='<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+  var needsSearch=SEARCH_PAT.test(userText);
+  setStatus(needsSearch?'ちょろがしらべてるよ...':'ちょろが考えてるよ...');
+  chatHistory.push({role:'user',content:userText});
+  try{
+    var messages=[{role:'system',content:SYSTEM}].concat(chatHistory);
+    var requestBody={
+      model:needsSearch?'gpt-4o-mini-search-preview':'gpt-4o-mini',
+      messages:messages,
+      max_tokens:200
+    };
+    var res=await fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},body:JSON.stringify(requestBody)});
+    if(!res.ok){var err=await res.json().catch(function(){return{};});throw new Error((err.error&&err.error.message)||'APIエラー '+res.status);}
+    var data=await res.json();
+    var reply=(data.choices&&data.choices[0]&&data.choices[0].message)?data.choices[0].message.content.trim():'なーに〜？';
+    chatHistory.push({role:'assistant',content:reply});
+    if(chatHistory.length>30)chatHistory=chatHistory.slice(-30);
+    bubble.textContent=reply;setStatus('ちょろがお返事したよ');setLog('');
+    speakTTS(reply,function(){processing=false;if(callback)callback();});
+  }catch(e){
+    setLog('エラー: '+e.message);
+    bubble.textContent='ごめんね〜もう一度よんでね';
+    processing=false;endConversation();
   }
 }
-
-wakeBtn.addEventListener('click', function(){
-  try { var ac = new (window.AudioContext || window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); } catch(e){}
-  if (isActive){
-    stopAll();
-    wakeBtn.className = ''; wakeBtn.textContent = '🐰 ちょろを起こす';
-    setStatus('停止中'); setIndicator('ボタンを押してちょろを起こしてね');
-    bubble.textContent = 'ちょろ、おやすみ〜';
-  } else {
-    isActive = true;
-    wakeBtn.className = 'on'; wakeBtn.textContent = '👂 ちょろ、待機中...';
-    setStatus('待機中');
-    startWakeListening();
+wakeBtn.addEventListener('click',function(){
+  try{var ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}
+  if(isActive){
+    stopAll();wakeBtn.className='';wakeBtn.textContent='🐰 ちょろを起こす';
+    setStatus('停止中');setIndicator('ボタンを押してちょろを起こしてね');
+    bubble.textContent='ちょろ、おやすみ〜';
+  }else{
+    isActive=true;wakeBtn.className='on';wakeBtn.textContent='👂 ちょろ、待機中...';
+    setStatus('待機中');startWakeListening();
   }
 });
 </script>
